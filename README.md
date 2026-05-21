@@ -110,4 +110,4 @@ npm run dev
 
 ## 许可
 
-本项目仅供学习使用。
+本项目基于 [Apache License 2.0](LICENSE) 开源。
