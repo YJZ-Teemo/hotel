@@ -36,10 +36,9 @@
             <el-form-item label="预约状态" prop="status">
               <el-select v-model="searchForm.status" placeholder="选择预约状态" clearable>
                 <el-option label="全部" value="" />
-                <el-option label="待确认" value="pending" />
-                <el-option label="已确认" value="confirmed" />
-                <el-option label="已取消" value="cancelled" />
-                <el-option label="已完成" value="completed" />
+                <el-option label="已确认" value="已确认" />
+                <el-option label="已取消" value="已取消" />
+                <el-option label="已完成" value="已完成" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -89,8 +88,8 @@
         <el-table-column label="操作" width="100" fixed="right">
           <template #default="scope">
             <el-button size="small" type="primary" @click="viewDetails(scope.row)" style="margin-left: 10px;">查看详情</el-button>
-            <!-- <el-button size="small" type="success" v-if="scope.row.status === 'pending'" @click="confirmReservation(scope.row)">确认</el-button> -->
-            <!-- <el-button size="small" type="danger" v-if="scope.row.status !== 'cancelled' && scope.row.status !== 'completed'" @click="cancelReservation(scope.row)">取消</el-button> -->
+            <!-- <el-button size="small" type="success" v-if="scope.row.status === '待确认'" @click="confirmReservation(scope.row)">确认</el-button> -->
+            <!-- <el-button size="small" type="danger" v-if="scope.row.status !== '已取消' && scope.row.status !== '已完成'" @click="cancelReservation(scope.row)">取消</el-button> -->
           </template>
         </el-table-column>
         <el-table-column prop="remark" label="备注" width="180" />
@@ -169,11 +168,11 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <!-- v-if="scope.row.status !== 'cancelled' && scope.row.status !== 'completed'" -->
+          <!-- v-if="scope.row.status !== '已取消' && scope.row.status !== '已完成'" -->
           <!-- <el-button @click="dialogVisible = false">取消</el-button> -->
-          <el-button v-if="form.status === 'confirmed'" type="danger" @click="cancelReservation">取消预约</el-button>
-          <el-button v-if="form.status === 'confirmed'" type="primary" @click="saveForm">保存</el-button>
-          <el-button v-if="form.status === 'confirmed'" type="success" @click="checkinnow">办理入住</el-button>
+          <el-button v-if="form.status === '已确认'" type="danger" @click="cancelReservation">取消预约</el-button>
+          <el-button v-if="form.status === '已确认'" type="primary" @click="saveForm">保存</el-button>
+          <el-button v-if="form.status === '已确认'" type="success" @click="checkinnow">办理入住</el-button>
         </span>
       </template>
     </el-dialog>
@@ -261,10 +260,9 @@ const filteredReservations = computed(() => {
 // 获取状态文本
 const getStatusText = (status) => {
   const statusMap = {
-    // pending: '待确认',
-    confirmed: '已确认',
-    completed: '已完成',
-    cancelled: '已取消'
+    '已确认': '已确认',
+    '已完成': '已完成',
+    '已取消': '已取消'
   };
   return statusMap[status] || status;
 };
@@ -272,10 +270,9 @@ const getStatusText = (status) => {
 // 获取状态标签类型
 const getStatusTagType = (status) => {
   const typeMap = {
-    // pending: 'warning',
-    confirmed: 'success',
-    completed: 'info',
-    cancelled: 'danger'
+    '已确认': 'success',
+    '已完成': 'info',
+    '已取消': 'danger'
   };
   return typeMap[status] || 'info';
 };
@@ -318,9 +315,9 @@ const form = reactive({
   price: ''
 });
 const saveForm = async () => {
-  if(form.status != 'cancelled' && form.status != 'completed'){
+  if(form.status != '已取消' && form.status != '已完成'){
     try {
-      const response = await api.post('/Reserve/update', 
+      const response = await api.post('/Reserve/update',
       {
         reserveId: form.id,
         checkIn: form.checkinDate,
@@ -340,9 +337,9 @@ const saveForm = async () => {
       console.error('保存表单失败:', error);
       ElMessage.error('保存表单失败');
     }
-  }else if(form.status === 'cancelled'){
+  }else if(form.status === '已取消'){
     ElMessage.error('已取消不能修改');
-  }else if(form.status === 'completed'){
+  }else if(form.status === '已完成'){
     ElMessage.error('已完成不能修改');
   }
 }
@@ -356,7 +353,7 @@ const viewDetails = (row) => {
 
 // 取消预约
 const cancelReservation = async () => {
-  if(form.status !== 'cancelled' && form.status !== 'completed'){
+  if(form.status !== '已取消' && form.status !== '已完成'){
     try {
       console.log('取消预约:', form.id);
       const response = await api.post('/Reserve/cancel', {
@@ -374,10 +371,10 @@ const cancelReservation = async () => {
       console.error('预约取消失败:', error);
       ElMessage.error('预约取消失败');
     }
-  }else if(form.status === 'cancelled'){
+  }else if(form.status === '已取消'){
     ElMessage.error('已取消的预约不能再次取消');
     return;
-  }else if(form.status === 'completed'){
+  }else if(form.status === '已完成'){
     ElMessage.error('已完成的预约不能取消');
     return;
 

@@ -55,13 +55,9 @@ import { showNotify } from 'vant';
 const router = useRouter();
 const route = useRoute();
 const roomList = ref([])
-const rooms = ref({
-  type: '',
-  price : '',
-  area: ''
-});
+const rooms = ref([]);
 const countList = ref([])
-const cardLevel = localStorage.getItem('Cardlevel') || '';
+const cardLevel = localStorage.getItem('cardlevel') || '待登录';
 const reserve = ref({
   start: '',
   end: ''
@@ -120,34 +116,22 @@ const cancelText = computed(() => {
   return `${month}月${day}日 18:00前可免费取消`
 })
 
-// 获取房间数据
-const fetchRoomsType = async () => {
+// 获取房间数据（最多重试3次）
+const fetchRoomsType = async (retries = 3) => {
   try {
     const response = await api.get('/Room/gettypelist');
     rooms.value = response.data;
   } catch (error) {
-    console.error('获取房间数据失败:', error);
-    rooms.value = [];
-    showNotify({ type: 'danger', message: '获取房间数据失败' });
+    // console.error('获取房间数据失败:', error);
+    if (retries > 1) {
+      setTimeout(() => fetchRoomsType(retries - 1), 2000);
+    } else {
+      rooms.value = [];
+      showNotify({ type: 'danger', message: '获取房间数据失败' });
+    }
   }
 };
 
-//获取房间数量
-// const fetchRoomsCount = async () => {
-//   try {
-//     const response = await api.get('/Room/gettypecount');
-//     const data = response.data;
-//     rooms.value = data.map(room => ({
-//       area:room.area,
-//       type: room.type,
-//       price:room.price
-//     }));
-//   } catch (error) {
-//     console.error('获取房间数据失败:', error);
-//     rooms.value = []; // 确保是数组
-//     showNotify({ type: 'danger', message: '获取房间数据失败' });
-//   }
-// };
 onMounted(() => {
   fetchRoomsType();
   // fetchRoomsCount();

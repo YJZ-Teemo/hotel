@@ -13,7 +13,7 @@
         </div>
 
         <div class="quick-actions">
-          <button v-for="item in headerActions" :key="item.text" type="button">
+          <button v-for="item in headerActions" :key="item.text" type="button" @click="item.route && router.push(item.route)">
             <van-icon :name="item.icon" />
             <span>{{ item.text }}</span>
           </button>
@@ -75,7 +75,7 @@ const points = localStorage.getItem('Points') || '0'
 
 const headerActions = [
   { icon: 'qr', text: '会员码' },
-  { icon: 'setting-o', text: '设置' },
+  { icon: 'setting-o', text: '设置', route: '/settings' },
   { icon: 'service-o', text: '客服' }
 ]
 

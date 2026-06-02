@@ -3,6 +3,7 @@ package com.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.entity.Customer;
 import com.mapper.CustomerMapper;
+import com.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,8 @@ public class CustomerController {
 
     @Autowired
     private CustomerMapper customerMapper;
+    @Autowired
+    private JWTUtil jwtUtil;
 
     @GetMapping("/list")
     public List<Customer> getlist() {
@@ -109,6 +112,8 @@ public class CustomerController {
         boolean isMatch = encoder.matches(customer.getPassword(), existing.getPassword());
 
         if (isMatch) {
+            String accessToken = jwtUtil.generateAccessToken(String.valueOf(existing.getId()), "CUSTOMER");
+            String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(existing.getId()), "CUSTOMER");
             result.put("status", "200");
             result.put("message", "登录成功");
             result.put("Name", existing.getName());
@@ -117,6 +122,8 @@ public class CustomerController {
             result.put("Points", existing.getPoints());
             result.put("Hobby", existing.getHobby());
             result.put("time", existing.getTime());
+            result.put("accessToken", accessToken);
+            result.put("refreshToken", refreshToken);
             return result;
         } else {
             return Map.of(

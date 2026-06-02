@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.entity.Customer;
 import com.entity.Employeeaccount;
 import com.mapper.EmployeeaccountMapper;
+import com.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,8 @@ import java.util.Map;
 public class EmployeeaccountController {
     @Autowired
     private EmployeeaccountMapper empMapper;
+    @Autowired
+    private JWTUtil jwtUtil;
 
     @GetMapping("/list")
     public List<Employeeaccount> getlist() {
@@ -85,11 +88,15 @@ public class EmployeeaccountController {
         boolean isMatch = encoder.matches(emp.getPassword(), existing.getPassword());
 
         if (isMatch) {
+            String accessToken = jwtUtil.generateAccessToken(String.valueOf(existing.getId()), existing.getManagement());
+            String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(existing.getId()), existing.getManagement());
             return Map.of(
                     "status", "200",
                     "message", "登录成功",
                     "Username", existing.getName(),
-                    "Management",existing.getManagement()
+                    "Management", existing.getManagement(),
+                    "accessToken", accessToken,
+                    "refreshToken", refreshToken
             );
         } else {
             return Map.of("status", "402", "message", "密码错误");

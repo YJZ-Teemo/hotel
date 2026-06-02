@@ -247,6 +247,7 @@ const submitForm = async () => {
     const data = response.data;
     if (data.status === '200') {
         ElMessage.success('提交入住成功');
+        resetForm();
       }else{
         ElMessage.error('提交入住失败: ' + data.message);
       }

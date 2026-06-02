@@ -32,11 +32,9 @@ const login = async () => {
     if (data.status === '200') {
       localStorage.setItem('username', data.Username);
       localStorage.setItem('management', data.Management);
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
       router.push('/admin');
-
-      console.log('router 类型:', typeof router);  // ← 加这行
-      console.log('router:', router);   
-
       ElMessage.success('登录成功');
     } else {
       ElMessage.error('登录失败: ' + data.message);

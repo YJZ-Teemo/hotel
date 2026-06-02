@@ -7,6 +7,7 @@ import com.mapper.CheckinlistMapper;
 import com.mapper.EvaluationMapper;
 import com.mapper.ReserveinfoMapper;
 import com.mapper.RoomMapper;
+import com.mapper.ScheduleMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,8 @@ public class CheckinlistController {
     private ReserveinfoMapper reserveinfoMapper;
     @Autowired
     private EvaluationMapper evalMapper;
+    @Autowired
+    private ScheduleMapper scheduleMapper;
 
      @GetMapping("/list")
     public List<Checkinlist> list() {
@@ -76,7 +79,7 @@ public class CheckinlistController {
         existing.setStatus("已入住");
         roomMapper.updateById(existing);
 
-        existing2.setState("completed");
+        existing2.setState("已完成");
         reserveinfoMapper.updateById(existing2);
 
         result.put("status", "200");
@@ -107,6 +110,23 @@ public class CheckinlistController {
         if ("已入住".equals(existingRoom.getStatus())) {
             existingRoom.setStatus("待收拾");
             roomMapper.updateById(existingRoom);
+
+            Schedule task = new Schedule();
+            task.setRNumber(existingCheckin.getRnumber());
+            task.setRoomType(existingCheckin.getRtype());
+            task.setCleanType("退房清洁");
+            task.setUrgent("0");
+            if ("套房".equals(existingCheckin.getRtype())) {
+                task.setEstimateMin(60);
+            } else if ("大床房".equals(existingCheckin.getRtype())) {
+                task.setEstimateMin(50);
+            } else {
+                task.setEstimateMin(40);
+            }
+            task.setRemark("退房后自动创建");
+            task.setStatus("待打扫");
+            task.setCreateTime(LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            scheduleMapper.insert(task);
         }else{
             result.put("status", "400");
             result.put("message", "该房间当前不可入住，状态：" + existingRoom.getStatus());

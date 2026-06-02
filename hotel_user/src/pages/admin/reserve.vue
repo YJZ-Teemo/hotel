@@ -175,17 +175,13 @@ const usedPoints = ref(0)
 const currentTime = ref(['14', '00'])
 const selectedArrivalTime = ref([...currentTime.value])
 const arrivalTimeText = computed(() => `${selectedArrivalTime.value[0]}:${selectedArrivalTime.value[1]}`)
-const name = localStorage.getItem('Name')
+const name = localStorage.getItem('username')
 const phone = localStorage.getItem('phone')
 const Points = ref(0)
 const loadPoints = () => {
   const customerInfo = JSON.parse(localStorage.getItem('customerInfo') || '{}')
   Points.value = Number(
-    localStorage.getItem('Points') ||
-    localStorage.getItem('points') ||
-    customerInfo.Points ||
-    customerInfo.points ||
-    0
+    localStorage.getItem('Points')
   )
   if (usedPoints.value > Points.value) {
     usedPoints.value = Points.value
@@ -325,7 +321,8 @@ const submitOrder = async () => {
       checkOut: getQueryValue('endDate'),
       reservationDate: formatDateValue(new Date()),
       breakfastCount: roomPoints.value,
-      remark: remark.value
+      remark: remark.value,
+      points:roomPoints.value
     })
 
     const data = response.data

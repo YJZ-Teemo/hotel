@@ -52,7 +52,9 @@
         <span class="social social-wechat"></span>
         <span class="social social-weibo"></span>
         <span class="social social-qq"></span>
-        <span class="social social-alipay"></span>
+        <RouterLink class="social staff-link" :to="'/employee-login'" title="员工登录">
+          <van-icon name="manager"  color="#5f8bfd"/>
+        </RouterLink>
       </div>
     </footer>
   </div>
@@ -87,12 +89,14 @@ const handleLogin = async () => {
     const data = response.data
 
     if (data.status === '200') {
-      Object.entries(data).forEach(([key, value]) => {
-        localStorage.setItem(key, value === null || value === undefined ? '' : String(value))
-      })
-      localStorage.setItem('username', data.Name || data.Username || data.username || data.name || phone.value)
-      localStorage.setItem('phone', data.Phone || phone.value)
-      localStorage.setItem('customerInfo', JSON.stringify(data))
+      localStorage.setItem('username', data.Name)
+      localStorage.setItem('phone', data.Phone )
+      localStorage.setItem('accessToken', data.accessToken)
+      localStorage.setItem('refreshToken', data.refreshToken)
+      localStorage.setItem('cardlevel',data.Cardlevel || '')
+      localStorage.setItem('hobby', data.Hobby || '')
+      localStorage.setItem('points',data.Points || '')
+      localStorage.setItem('time',data.time || '')
       router.push('/home')
       showNotify({ type: 'success', message: '登录成功' })
     } else {
@@ -190,6 +194,8 @@ const handleLogin = async () => {
   place-items: center;
   font-size: 1.8rem;
   letter-spacing: 0.14em;
+  padding-left: 0.25rem;
+  text-shadow: 0.125rem 0.25rem 0.25rem rgba(0, 0, 0, 0.5);
 }
 
 .brand-text {
@@ -362,8 +368,14 @@ const handleLogin = async () => {
   background: #1f8fff;
 }
 
-.social-alipay::before {
-  background: #009ee8;
+.staff-link::before {
+  display: none;
+}
+
+.staff-link {
+  color: #fff;
+  font-size: 1.2rem;
+  text-decoration: none;
 }
 
 @media (max-width: 420px) {

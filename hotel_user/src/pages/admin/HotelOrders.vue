@@ -154,8 +154,8 @@ const loadMyReserve = async () => {
         return {
           id: item.reserveId || index + 1,
           hotel: item.hotel || '广州xx酒店',
-          status: item.state === 'completed' ? '已完成' : item.state === 'confirmed' ? '待入住' : (item.state || ''),
-          tab: item.state === 'completed' ? '待评价' : item.state === 'confirmed' ? '待入住' : '',
+          status: item.state === '已完成' ? '已完成' : item.state === '已确认' ? '待入住' : (item.state || ''),
+          tab: item.state === '已完成' ? '待评价' : item.state === '已确认' ? '待入住' : '',
           dates: `${checkIn}-${checkOut}`,
           nights: `共${nights}晚`,
           room: roomTypeMap[item.rtype] || item.rtype || '',
@@ -189,8 +189,8 @@ const loadMyReserve2 = async () => {
         return {
           id: item.reserveId || index + 1,
           hotel: item.hotel || '广州xx酒店',
-          status: item.state === 'completed' ? '已完成' : item.state === 'confirmed' ? '待入住' : (item.state || ''),
-          tab: item.state === 'completed' ? '待评价' : item.state === 'confirmed' ? '待入住' : '',
+          status: item.state === '已完成' ? '已完成' : item.state === '已确认' ? '待入住' : (item.state || ''),
+          tab: item.state === '已完成' ? '待评价' : item.state === '已确认' ? '待入住' : '',
           dates: `${checkIn}-${checkOut}`,
           nights: `共${nights}晚`,
           room: roomTypeMap[item.rtype] || item.rtype || '',

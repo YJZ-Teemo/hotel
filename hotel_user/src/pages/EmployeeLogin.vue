@@ -4,26 +4,22 @@
 
     <header class="auth-header">
       <button type="button" class="icon-btn" @click="router.back()">
-        <van-icon name="arrow-left" />
+        <van-icon name="cross" />
       </button>
-      <RouterLink class="login-link" to="/login">登录</RouterLink>
+      <span class="title">员工登录</span>
+      <span></span>
     </header>
 
     <main class="auth-body">
       <section class="brand-block">
-        <div class="brand-icon">H</div>
-        <div class="brand-text">HOTEL</div>
+        <div class="brand-icon">S</div>
+        <div class="brand-text">STAFF</div>
       </section>
 
-      <form class="form-card" @submit.prevent="register">
+      <form class="form-card" @submit.prevent="handleLogin">
         <div class="input-row">
           <van-icon name="manager-o" />
           <input v-model.trim="username" type="text" placeholder="请输入账号" autocomplete="username" />
-        </div>
-
-        <div class="input-row">
-          <van-icon name="phone-o" />
-          <input v-model.trim="phone" type="tel" placeholder="请输入手机号" autocomplete="tel" />
         </div>
 
         <div class="input-row">
@@ -32,31 +28,16 @@
             v-model.trim="password"
             :type="showPassword ? 'text' : 'password'"
             placeholder="请输入密码"
-            autocomplete="new-password"
+            autocomplete="current-password"
           />
           <button class="eye-btn" type="button" @click="showPassword = !showPassword">
             <van-icon :name="showPassword ? 'eye-o' : 'closed-eye'" />
           </button>
         </div>
 
-        <div class="input-row">
-          <van-icon name="passed" />
-          <input
-            v-model.trim="confirmPassword"
-            :type="showPassword ? 'text' : 'password'"
-            placeholder="请确认密码"
-            autocomplete="new-password"
-          />
-        </div>
-
         <p v-if="errorMessage" class="error-text">{{ errorMessage }}</p>
 
-        <button type="submit" class="submit-btn">注册</button>
-
-        <div class="extra-links">
-          <span>已有账号？</span>
-          <RouterLink to="/login">立即登录</RouterLink>
-        </div>
+        <button type="submit" class="submit-btn">登录</button>
       </form>
     </main>
   </div>
@@ -65,44 +46,40 @@
 <script setup>
 import { showNotify } from 'vant'
 import { ref } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import api from '../api'
 
 const router = useRouter()
 const username = ref('')
-const phone = ref('')
 const password = ref('')
-const confirmPassword = ref('')
 const showPassword = ref(false)
 const errorMessage = ref('')
 
-const register = async () => {
-  if (!username.value || !phone.value || !password.value || !confirmPassword.value) {
-    errorMessage.value = '请填写完整注册信息'
-    return
-  }
-
-  if (password.value !== confirmPassword.value) {
-    errorMessage.value = '两次输入的密码不一致'
+const handleLogin = async () => {
+  if (!username.value || !password.value) {
+    errorMessage.value = '请输入账号和密码'
     return
   }
 
   errorMessage.value = ''
 
   try {
-    const response = await api.post('/Customer/register', {
-      name: username.value,
-      phone: phone.value,
+    const response = await api.post('/Employeeaccount/login', {
+      username: username.value,
       password: password.value
     })
 
     const data = response.data
 
     if (data.status === '200') {
-      showNotify({ type: 'success', message: '注册成功' })
-      router.push('/login')
+      localStorage.setItem('username', data.Username)
+      localStorage.setItem('management', data.Management)
+      localStorage.setItem('accessToken', data.accessToken)
+      localStorage.setItem('refreshToken', data.refreshToken)
+      showNotify({ type: 'success', message: '登录成功' })
+      router.push('/ehome')
     } else {
-      showNotify({ type: 'danger', message: '注册失败: ' + (data.message || '请稍后重试') })
+      showNotify({ type: 'danger', message: '登录失败: ' + (data.message || '账号或密码错误') })
     }
   } catch (error) {
     console.error('网络错误:', error)
@@ -155,8 +132,6 @@ const register = async () => {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
   line-height: 1;
-  padding-left: 0.25rem;
-  text-shadow: 0.125rem 0.25rem 0.25rem rgba(0, 0, 0, 0.5);
 }
 
 .icon-btn .van-icon {
@@ -164,11 +139,10 @@ const register = async () => {
   line-height: 1;
 }
 
-.login-link {
+.title {
   color: #fff;
   font-size: 1rem;
   font-weight: 600;
-  text-decoration: none;
 }
 
 .auth-body {
@@ -197,6 +171,7 @@ const register = async () => {
   font-size: 1.8rem;
   letter-spacing: 0.14em;
   text-shadow: 0.125rem 0.25rem 0.25rem rgba(0, 0, 0, 0.5);
+    padding-left: 0.25rem;
 }
 
 .brand-text {
@@ -276,21 +251,6 @@ const register = async () => {
   color: #1c1c1c;
   font-size: 1.08rem;
   font-weight: 700;
-}
-
-.extra-links {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.4rem;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.92rem;
-}
-
-.extra-links a {
-  color: #fff;
-  font-weight: 600;
-  text-decoration: none;
 }
 
 @media (max-width: 420px) {

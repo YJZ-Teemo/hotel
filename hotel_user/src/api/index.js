@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { showNotify } from 'vant';
+import router from '../router';
 
 const api = axios.create({
   baseURL: 'http://localhost:8080',
@@ -7,38 +9,36 @@ const api = axios.create({
     'Content-Type': 'application/json'
   }
 });
-/*
-// --- 请求拦截器：发请求之前做点什么 ---
+
+// 请求拦截器：自动携带 token
 api.interceptors.request.use(
   config => {
-    // 比如：每次请求都自动带上本地存好的 Token
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
-      config.headers.Authorization = token;
+      config.headers.Authorization = 'Bearer ' + token;
     }
-    return config; // 必须返回 config，否则请求发不出去
+    return config;
   },
   error => {
     return Promise.reject(error);
   }
 );
 
-// --- 响应拦截器：收到响应后做点什么 ---
+// 响应拦截器：统一错误处理
 api.interceptors.response.use(
   response => {
-    // 比如：后端返回 {status: '500', msg: '系统错误'}
-    // 这里可以直接统一弹窗提示，不用在每个组件里都写一遍
-    if (response.data.status !== '200') {
-       showNotify({ type: 'danger', message: response.data.msg || '系统错误' });
-    }
-    return response; 
+    return response;
   },
   error => {
-    // 比如：断网了，或者服务器崩了（500）
-    showNotify({ type: 'danger', message: '服务器连接异常，请稍后重试' });
+    if (error.response && error.response.status === 401) {
+      showNotify({ type: 'danger', message: '登录已过期，请重新登录' });
+    } else if (error.response && error.response.status === 403) {
+      showNotify({ type: 'danger', message: '网络出现故障' });
+    } else {
+      showNotify({ type: 'danger', message: '服务器连接异常，请稍后重试' });
+    }
     return Promise.reject(error);
   }
 );
-*/
 
 export default api;

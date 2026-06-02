@@ -27,7 +27,10 @@ public class ReserveinfoController {
 
     @GetMapping("/list")
     public List<Reserveinfo> list(){
-        List<Reserveinfo> list = reserveinfoMapper.selectList(null);
+        List<Reserveinfo> list = reserveinfoMapper.selectList(
+                new LambdaQueryWrapper<Reserveinfo>()
+                        .last("ORDER BY CASE WHEN State = '已确认' THEN 0 ELSE 1 END, ReservationDate DESC")
+        );
         for (Reserveinfo info : list) {
             Customer customer = customerMapper.selectOne(
                     new LambdaQueryWrapper<Customer>()
@@ -53,7 +56,7 @@ public class ReserveinfoController {
                     "message", "未找到编号为 " + reserveinfo.getReserveId() + " 的预约记录"
             );
         }
-        existing.setState("cancelled");
+        existing.setState("已取消");
         reserveinfoMapper.updateById(existing);
         return Map.of(
                 "status", "200",
@@ -91,7 +94,7 @@ public class ReserveinfoController {
         reserveinfo.setReserveId(reserveId);
 
         // 设置默认状态
-        reserveinfo.setState("confirmed");
+        reserveinfo.setState("已确认");
 
         // 检查是否已存在相同 ReserveId 的记录（理论上不会重复，但保留校验）
         Reserveinfo existing = reserveinfoMapper.selectOne(
@@ -187,7 +190,7 @@ public class ReserveinfoController {
         List<Reserveinfo> list = reserveinfoMapper.selectList(
                 new LambdaQueryWrapper<Reserveinfo>()
                         .eq(Reserveinfo::getCname, customer.getName())
-                        .eq(Reserveinfo::getState, "confirmed")
+                        .eq(Reserveinfo::getState, "已确认")
         );
 
         if (list == null || list.isEmpty()) {

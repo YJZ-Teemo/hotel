@@ -65,7 +65,6 @@ const route = useRoute()
 const router = useRouter()
 const content = ref('')
 const overallScore = ref(5)
-const scoreLabels = ['很差', '较差', '一般', '满意', '超赞']
 const detailScores = ref([
   { name: '房间', value: 5 },
   { name: '服务', value: 5 },
@@ -76,9 +75,16 @@ const title = computed(() => route.query.hotel || '酒店评价')
 const checkinNum = computed(() => route.query.checkinNum || '')
 const roomType = computed(() => route.query.roomType || '')
 
-const getScoreText = (value) => {
-  return scoreLabels[value - 1] || '超赞'
+// 评分文本映射
+const scoreTextMap = {
+  1: '很差',
+  2: '较差',
+  3: '一般',
+  4: '满意',
+  5: '非常满意'
 }
+const getScoreText = (score) => scoreTextMap[score] || '非常满意'
+
 
 // const publishReview2 = () => {
 //   console.log('checkinNum:', checkinNum.value)
@@ -87,7 +93,7 @@ const getScoreText = (value) => {
 //   console.log(`总体评分${overallScore.value}星  ${detailText}`)
 //   console.log('评价内容:', content.value)
 // }
-const detailText = detailScores.value.map((item) => `${item.name}${item.value}星`).join('  ')
+const detailText = detailScores.value.map((item) => `${item.name}${item.value}`).join('  ')
 const publishReview = async () => {
   try {
     const response = await api.post('/Evaluation/add', {

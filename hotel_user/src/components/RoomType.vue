@@ -20,7 +20,7 @@
 
     <div class="room-plan">
       <div class="plan-info">
-        <div class="plan-title" v-if="cardLevel!=''">{{ cardLevel }}价 <span class="arrow">›</span></div>
+        <div class="plan-title" v-if="cardLevel !== '待登录'">{{ cardLevel }}价 <span class="arrow">›</span></div>
         <div class="cancel-line">
           不含早餐 <span>| {{ cancelText }}</span>
         </div>
@@ -36,7 +36,7 @@
           <span class="currency">¥</span>
           <span class="price">{{ info.newprice }}</span>
         </div>
-        <div class="discount-line">{{ cardLevel }} {{ info.discount }}折</div>
+        <div class="discount-line" v-if="cardLevel !== '待登录'">{{ cardLevel }} {{ info.discount }}折</div>
       </div>
 
       <button class="book-button" @click="handleRoom" type="button">订</button>
@@ -72,6 +72,7 @@ const info = ref({
 
 const Discountprice = () => {
   const map = {
+    '待登录': { discount: '9.9', rate: 1.0 ,points:'0倍积分',pointstext:0},
     '星会员':   { discount: '9.5', rate: 0.95 ,points:'1倍积分',pointstext:1},
     '二星会员': { discount: '9.0', rate: 0.90 ,points:'1.2倍积分',pointstext:1.2},
     '三星会员': { discount: '8.5', rate: 0.85 ,points:'1.5倍积分',pointstext:1.5},
